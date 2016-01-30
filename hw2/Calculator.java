@@ -2,6 +2,8 @@ import list.EquationList;
 
 public class Calculator {
     // YOU MAY WISH TO ADD SOME FIELDS
+    private EquationList history;
+    private int historySize = 0;
 
     /**
      * TASK 2: ADDING WITH BIT OPERATIONS
@@ -66,6 +68,12 @@ public class Calculator {
      **/
     public void saveEquation(String equation, int result) {
         // YOUR CODE HERE
+        if (history == null) {
+            history = new EquationList(equation, result, null);
+        } else {
+            history = new EquationList(equation, result, history);            
+        }
+        historySize++;
     }
 
     /**
@@ -77,6 +85,7 @@ public class Calculator {
      **/
     public void printAllHistory() {
         // YOUR CODE HERE
+        printHistory(historySize);
     }
 
     /**
@@ -88,6 +97,16 @@ public class Calculator {
      **/
     public void printHistory(int n) {
         // YOUR CODE HERE
+        EquationList p = history;
+        int i = 0;
+        while (p != null) {
+            if (i >= n) {
+                break;
+            }
+            System.out.println(p.equation + " = " + p.result);
+            p = p.next;
+            i++;
+        }
     }    
 
     /**
@@ -96,6 +115,8 @@ public class Calculator {
     **/
     public void undoEquation() {
         // YOUR CODE HERE
+        history = history.next;
+        historySize--;
     }
 
     /**
@@ -104,6 +125,8 @@ public class Calculator {
      **/
     public void clearHistory() {
         // YOUR CODE HERE
+        history = null;
+        historySize = 0;
     }
 
     /**
@@ -114,7 +137,13 @@ public class Calculator {
      **/
     public int cumulativeSum() {
         // YOUR CODE HERE
-        return -1;
+        int result = 0;
+        EquationList p = history;
+        while (p != null) {
+            result += p.result;
+            p = p.next;
+        }
+        return result;
     }
 
     /**
@@ -125,6 +154,12 @@ public class Calculator {
      **/
     public int cumulativeProduct() {
         // YOUR CODE HERE
-        return -1;
+        int result = 1;
+        EquationList p = history;
+        while (p != null) {
+            result *= p.result;
+            p = p.next;
+        }
+        return result;
     }
 }
