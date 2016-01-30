@@ -13,7 +13,14 @@ public class Calculator {
      **/
     public int add(int x, int y) {
         // YOUR CODE HERE
-        return -1;
+        int z;
+        while (x != 0) {
+            z = x & y;
+            y = x ^ y;
+            z = z << 1;
+            x = z;
+        }
+        return y;
     }
 
     /**
@@ -26,7 +33,26 @@ public class Calculator {
      **/
     public int multiply(int x, int y) {
         // YOUR CODE HERE
-        return -1;
+        // Absolute values of x and y
+        int xp = (x < 0) ? (add(~x, 1)) : x;
+        int yp = (y < 0) ? (add(~y, 1)) : y;
+        int z = 0;
+
+        // Multiply without considering the sign
+        while (yp != 0) {
+            if ((yp & 1) != 0) {
+                z = add(z, xp);
+            }
+            xp = xp << 1;
+            yp = yp >> 1;
+        }
+
+        // Determine the sign before returning the result
+        if ((x ^ y) < 0) {
+            return add(~z, 1);
+        } else {
+            return z;
+        }
     }
 
     /**
