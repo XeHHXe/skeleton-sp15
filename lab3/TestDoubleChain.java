@@ -27,6 +27,7 @@ public class TestDoubleChain {
         d.insertFront(1);
         d.insertBack(7);
         d.insertBack(8);
+        System.out.println(d.toString());
         assertEquals(1, d.getFront().val, 1e-11);
         assertEquals(8, d.getBack().val, 1e-11);
     }
