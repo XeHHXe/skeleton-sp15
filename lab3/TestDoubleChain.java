@@ -63,8 +63,9 @@ public class TestDoubleChain {
 		d.insertBack(3.3);
 		d.insertBack(4.6);
 		d.insertBack(5.2);
+		d.insertBack(5.2);
 		d.deleteByValue(3.3);
-		assertEquals("<[1.0, 2.1, 4.6, 5.2]>", d.toString());
+		assertEquals("<[1.0, 2.1, 4.6, 5.2, 5.2]>", d.toString());
 		d.deleteByValue(5.2);
 		assertEquals("<[1.0, 2.1, 4.6]>", d.toString());
 		d.deleteByValue(1.0);

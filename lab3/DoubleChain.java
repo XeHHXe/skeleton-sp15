@@ -87,13 +87,14 @@ public class DoubleChain {
 		int i = 0;
 		DNode p = head;
 		if (Math.abs(p.val - val) < 1e-8) {
-			deleteByIndex(i);
+			deleteByIndex(i); // no need to add index
 		}
 		while (p.next != null) {
 			p = p.next;
 			i++;
 			if (Math.abs(p.val - val) < 1e-8) {
 				deleteByIndex(i);
+				i--;
 			}
 		}
 	}
