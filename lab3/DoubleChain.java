@@ -59,9 +59,43 @@ public class DoubleChain {
 		String result = String.valueOf(p.val);
 		while (p.next != null) {
 			p = p.next;
-			result = result + " " + String.valueOf(p.val);
+			result = result + ", " + String.valueOf(p.val);
 		}
-		return result;
+		return "<[" + result + "]>";
+	}
+
+	public void deleteByIndex(int n) {
+		if (n == 0) {
+			head = head.next;
+			return;
+		}
+		int i = 0;
+		DNode p = head;
+		while (p.next != null & i < n) {
+			p = p.next;
+			i++;
+		}
+		if (p.next != null) {
+			p.prev.next = p.next;
+			p.next.prev = p.prev;
+		} else {
+			p.prev.next = null;
+		}
+	}
+
+	public void deleteByValue(double val) {
+		int i = 0;
+		DNode p = head;
+		if (Math.abs(p.val - val) < 1e-8) {
+			deleteByIndex(i);
+		}
+		while (p.next != null) {
+			p = p.next;
+			i++;
+			if (Math.abs(p.val - val) < 1e-8) {
+				deleteByIndex(i);
+			}
+		}
 	}
 
 	public static class DNode {
