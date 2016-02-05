@@ -1,16 +1,19 @@
+import java.lang.Math;
+
 public class Piece {
-	private boolean isFire;
+	private boolean fire;
 	private Board b;
 	private int x;
 	private int y;
 	private String type;
-	private boolean isKing = false;
-	private boolean isCaptured = false;
+	private boolean king = false;
+	private boolean captured = false;
 
 	/* Constructor for a piece. */
 	public Piece(boolean isFire, Board b, int x, int y, String type) {
-		this.isFire = isFire;
+		this.fire = isFire;
 		this.b = b;
+		this.b.place(this, x, y); // Places this piece on board.
 		this.x = x;
 		this.y = y;
 		this.type = type;
@@ -18,17 +21,17 @@ public class Piece {
 
 	/* Returns whether or not the piece is a fire piece. */
 	public boolean isFire() {
-		return isFire;
+		return fire;
 	}
 
 	/* Returns 0 if the piece is a fire piece, or 1 if the piece is a water piece. */
 	public int side() {
-		return isFire ? 0 : 1;
+		return fire ? 0 : 1;
 	}
 
 	/* Returns whether or not the piece has been crowned. */
 	public boolean isKing() {
-		return isKing;
+		return king;
 	}
 
 	/* Returns whether or not the piece is a Bomb Piece. */
@@ -43,17 +46,28 @@ public class Piece {
 
 	/* Assumes this Piece's movement from its current position to (x, y) is valid. */
 	public void move(int x, int y) {
-
+		if ((fire && y == 7) || (!fire && y == 0)) {
+			king = true;
+		}
+		int xp = this.x;
+		int yp = this.y;
+		if ((x - xp) * (x - xp) + (y - yp) * (y - yp) == 2) {
+			int x_rm = (x + xp) / 2;
+			int y_rm = (y + yp) / 2;
+			b.remove(x_rm, y_rm);
+			captured = true;
+		}
+		b.place(this, x, y);
 	}
 
 	/* Returns whether or not this Piece has captured another piece this turn. */
 	public boolean hasCaptured() {
-		return isCaptured;
+		return captured;
 	}
 	
 	/* Called at the end of each turn on the Piece that moved. 
 	 * Makes sure the piece's hasCaptured() value returns to false. */
 	public void doneCapturing() {
-		isCaptured = false;
+		captured = false;
 	}
 }
