@@ -51,12 +51,14 @@ public class Piece {
 		}
 		int xp = this.x;
 		int yp = this.y;
-		if ((x - xp) * (x - xp) + (y - yp) * (y - yp) == 2) {
-			int x_rm = (x + xp) / 2;
-			int y_rm = (y + yp) / 2;
-			b.remove(x_rm, y_rm);
+		if ((x - xp) * (x - xp) + (y - yp) * (y - yp) == 8) {
+			int xm = (x + xp) / 2;
+			int ym = (y + yp) / 2;
+			b.remove(xm, ym);
 			captured = true;
 		}
+		this.x = x;
+		this.y = y;
 		b.place(this, x, y);
 	}
 

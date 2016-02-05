@@ -2,7 +2,10 @@ public class Board {
 	private static int N = 8;
 	private boolean shouldBeEmpty;
 	private Piece[][] pieces = new Piece[N][N];
-	private boolean fireTurn = false;
+	private Piece selectedPiece;
+	private boolean fireTurn = true;
+	private boolean turned = false;
+	private boolean moved = false;
 
 	/* Starts a GUI supported version of the game */
 	public static void main(String[] args) {
@@ -11,19 +14,43 @@ public class Board {
 		Board b = new Board(false);
 		b.drawBoard(N);
 		b.updateBoard();
-		// pieces = new boolean[N][N];
 
-		/* Monitors for mouse presses. Wherever the mouse is pressed,
-		 * a new piece appears. */
-		// while (true) {
-		// 	drawBoard(N);
-		// 	if (StdDrawPlus.mousePressed()) {
-		// 		double x = StdDrawPlus.mouseX();
-		// 		double y = StdDrawPlus.mouseY();
-		// 		pieces[(int) x][(int) y] = true;
-		// 	}            
-		// 	StdDrawPlus.show(100);
-		// }
+		while (b.winner() == null) {
+			int x = 1;
+			int y = 0;
+			if (StdDrawPlus.mousePressed()) {
+				x = (int) StdDrawPlus.mouseX();
+				y = (int) StdDrawPlus.mouseY();
+			}			
+			StdDrawPlus.show(10);
+
+			if (b.pieceAt(x, y) != null) {
+				if (b.canSelect(x, y)) {
+					b.drawBoard(N);
+					b.select(x, y);
+					b.updateBoard();
+				}
+			} else {
+				if (b.canSelect(x, y)) {
+					b.drawBoard(N);
+					b.select(x, y);
+					if (b.selectedPiece.isBomb() && b.selectedPiece.hasCaptured()) {
+						StdDrawPlus.setPenColor(StdDrawPlus.GRAY);
+						StdDrawPlus.filledSquare(x + .5, y + .5, .5);	
+					}
+					b.updateBoard();
+				}				
+			}
+			if (b.canEndTurn() && StdDrawPlus.isSpacePressed()) {
+				b.endTurn();
+				b.drawBoard(N);
+				b.updateBoard();
+			}
+		}
+
+		b.drawBoard(N);
+		b.updateBoard();
+		System.out.println(b.winner() + " WINS!");
 	}
 
 	/* The constructor for Board. If shouldBeEmpty is true, initializes an empty Board.
@@ -57,18 +84,150 @@ public class Board {
 
 	/* Returns true if the square at (x, y) can be selected. */
 	public boolean canSelect(int x, int y) {
+		Piece p = pieceAt(x, y);
+
+		if (moved) {
+			return false;
+		}
+
+		if (p != null) {
+			// Squares with a piece
+			if ((fireTurn && p.isFire())|| (!fireTurn && !p.isFire())) {
+				if (selectedPiece == null) { // The player has not selected a piece yet.
+					return true;
+				} else if (selectedPiece == p) { // The player has selected a piece, but did not move it.
+					return true;					
+				}
+			}
+		} else {
+			// Empty squares
+			if (selectedPiece != null) {
+				// Due to the stupid API of Piece, we have to find the selected piece.
+				int i = 0;
+				int j = 0;
+				// http://stackoverflow.com/questions/886955/breaking-out-of-nested-loops-in-java
+				outerLoop:
+				for (i = 0; i < N; i++) {
+					for (j = 0; j < N; j++) {
+						if (pieceAt(i, j) == selectedPiece) {
+							break outerLoop;
+						}
+					}
+				}
+				/* During this turn, the player has selected a Piece which hasn’t moved
+				 * yet and is selecting an empty spot which is a valid move for the
+				 * previously selected Piece. */
+				if (selectedPiece == p && validMove(i, j, x, y)) {
+					return true;
+				}
+
+				/* During this turn, the player has selected a Piece, captured, and has
+				 * selected another valid capture destination. When performing
+				 * multi-captures, you should only select the active piece once; all
+				 * other selections should be valid destination points. */
+				if (!selectedPiece.hasCaptured()) {
+					return validMove(i, j, x, y);
+				}
+			} 
+		}
 		return false;
 	}
 
 	/* Returns true if the piece at (xi, yi) can either move to (xf, yf) or capture to
 	 * (xf, yf), strictly from a geometry/piece-race point of view. */
 	private boolean validMove(int xi, int yi, int xf, int yf) {
+		if (xi < 0 || xi > N - 1 || yi < 0 || yi > N - 1) {
+			return false;
+		}
+		if (xf < 0 || xf > N - 1 || yf < 0 || yf > N - 1) {
+			return false;
+		}
+
+		int dx = xf - xi;
+		int dy = yf - yi;
+
+		// Simple move
+		if (pieceAt(xi, yi).isKing()) {
+			if (dx * dx + dy * dy == 2) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			if (fireTurn && dx * dx == 1 && dy == 1) {
+				return true;
+			} else if (!fireTurn && dx * dx == 1 && dy == -1) {
+				return true;
+			}
+		}
+
+		// Capture
+		int xm = (xi + xf) / 2;
+		int ym = (yi + yf) / 2;
+		if (pieceAt(xi, yi).isKing()) {
+			if (dx * dx + dy * dy == 8) {
+				if (fireTurn && !pieceAt(xm, ym).isFire()) { // Fire captures water.
+					return true;
+				} else if (!fireTurn && pieceAt(xm, ym).isFire()) { // Water captures fire.
+					return true;
+				} else {
+					return false;
+				}
+			}
+		} else {
+			if (fireTurn && dx * dx == 4 && dy == 2 && !pieceAt(xm, ym).isFire()) {
+				return true;
+			} else if (!fireTurn && dx * dx == 4 && dy == -2 && pieceAt(xm, ym).isFire()) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
 		return false;
 	}
 
 	/* Selects the square at (x, y). */
 	public void select(int x, int y) {
+		if (pieceAt(x, y) != null) {
+			selectedPiece = pieceAt(x, y);
+			StdDrawPlus.setPenColor(StdDrawPlus.WHITE);
+			StdDrawPlus.filledSquare(x + .5, y + .5, .5);
+		} else {
+			if (selectedPiece != null) {
+				selectedPiece.move(x, y);
+				turned = true;
+				if (!selectedPiece.hasCaptured()) {
+					moved = true;
+				} else if (selectedPiece.isBomb()) {
+					explode(selectedPiece);
+					moved = true;
+				}
+			}
+		}
+	}
 
+	/* Remove pieces destroyed by the explosion. */
+	private void explode(Piece p) {
+		int i = 0;
+		int j = 0;
+
+		outerLoop:
+		for (i = 0; i < N; i++) {
+			for (j = 0; j < N; j++) {
+				if (pieceAt(i, j) == p) {
+					break outerLoop;
+				}
+			}
+		}
+
+		for (int m = i - 1; m <= i + 1; m++) {
+			for (int n = j - 1; n <= j + 1; j++) {
+				if (pieceAt(m, n) != null && !pieceAt(m, n).isShield()) {
+					remove(m, n);
+				}
+			}
+		}
 	}
 
 	/* Places p at (x, y). */
@@ -76,28 +235,78 @@ public class Board {
 		if (x < 0 || x > N - 1 || y < 0 || y > N - 1 || p == null) {
 			return;
 		} else {
-			// Checking before placing p!
+			// Checking if p is already on the board.
+			for (int i = 0; i < N; i++) {
+				for (int j = 0; j < N; j++) {
+					if (pieceAt(i, j) == p) {
+						if (i == x && j == y) {
+							turned = false;
+							return;
+						}
+						pieces[i][j] = null;
+					}
+				}
+			}
 			pieces[x][y] = p;
 		}
 	}
 
 	/* Executes a remove. */
 	public Piece remove(int x, int y) {
-		return null;
+		if (x < 0 || x > N - 1 || y < 0 || y > N - 1) {
+			System.out.println("Out of bound!");
+			return null;
+		} 
+		if (pieces[x][y] == null) {
+			System.out.println("No piece here!");
+			return null;
+		}
+		Piece pieceXY = pieceAt(x, y);
+		pieces[x][y] = null;
+		return pieceXY;
 	}
 
 	/* Returns whether or not the the current player can end their turn. */
 	public boolean canEndTurn() {
-		return false;
+		return turned;
 	}
 
 	/* Called at the end of each turn. */
 	public void endTurn() {
-
+		fireTurn = !fireTurn;
+		turned = false;
+		if (selectedPiece != null) {
+			selectedPiece.doneCapturing();
+		}
+		selectedPiece = null;
+		moved = false;
 	}
 
 	/* Returns the winner of the game: "Fire", "Water", "No one", or null. */
 	public String winner() {
+		boolean fireExist = false;
+		boolean waterExist = false;
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				if (pieceAt(i, j) != null) {
+					if (pieceAt(i, j).isFire()) {
+						fireExist = true;
+					} else {
+						waterExist = true;
+					}
+				}
+			}
+		}
+
+		if (!fireExist && !waterExist) {
+			return "No one";
+		}
+		if (fireExist && !waterExist) {
+			return "Fire";
+		}
+		if (!fireExist && waterExist) {
+			return "Water";
+		}
 		return null;
 	}
 
@@ -111,11 +320,11 @@ public class Board {
 					StdDrawPlus.setPenColor(StdDrawPlus.RED);
 				}
 				StdDrawPlus.filledSquare(i + .5, j + .5, .5);
-				// StdDrawPlus.setPenColor(StdDrawPlus.WHITE);
 			}
 		}
 	}
 
+	/* Draw pieces using the current configuration. */
 	private void drawPieces(Piece p, int x, int y) {
 		String img = "";
 		if (p != null) {
@@ -166,6 +375,7 @@ public class Board {
 		}
 	}
 
+	/* Redraw the board with new configuration of pieces. */
 	private void updateBoard() {
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
