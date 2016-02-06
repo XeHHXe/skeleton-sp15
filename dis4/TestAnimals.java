@@ -11,7 +11,7 @@ public class TestAnimals {
 		((Cat) a).greet(); // Cat Garfield says: Meow!
 
 		/* Compiler error!
-		 * because a Dog is a Animal, but a Animal is not necessarily a dog. */
+		 * because a Dog is an Animal, but an Animal is not necessarily a Dog. */
 		// a = new Dog("Hiernoymus", 10);
 		// d = a;
 
