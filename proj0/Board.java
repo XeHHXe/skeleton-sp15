@@ -24,23 +24,12 @@ public class Board {
 			}			
 			StdDrawPlus.show(10);
 
-			if (b.pieceAt(x, y) != null) {
-				if (b.canSelect(x, y)) {
-					b.drawBoard(N);
-					b.select(x, y);
-					b.updateBoard();
-				}
-			} else {
-				if (b.canSelect(x, y)) {
-					b.drawBoard(N);
-					b.select(x, y);
-					if (b.selectedPiece.isBomb() && b.selectedPiece.hasCaptured()) {
-						StdDrawPlus.setPenColor(StdDrawPlus.GRAY);
-						StdDrawPlus.filledSquare(x + .5, y + .5, .5);	
-					}
-					b.updateBoard();
-				}				
+			if (b.canSelect(x, y)) {
+				b.drawBoard(N);
+				b.select(x, y);
+				b.updateBoard();
 			}
+
 			if (b.canEndTurn() && StdDrawPlus.isSpacePressed()) {
 				b.endTurn();
 				b.drawBoard(N);
@@ -48,9 +37,11 @@ public class Board {
 			}
 		}
 
+		StdDrawPlus.show(10);
 		b.drawBoard(N);
 		b.updateBoard();
 		System.out.println(b.winner() + " WINS!");
+		return;
 	}
 
 	/* The constructor for Board. If shouldBeEmpty is true, initializes an empty Board.
@@ -92,12 +83,13 @@ public class Board {
 
 		if (p != null) {
 			// Squares with a piece
-			if ((fireTurn && p.isFire())|| (!fireTurn && !p.isFire())) {
-				if (selectedPiece == null) { // The player has not selected a piece yet.
-					return true;
-				} else if (selectedPiece == p) { // The player has selected a piece, but did not move it.
-					return true;					
-				}
+			if ((fireTurn && p.isFire()) || (!fireTurn && !p.isFire())) {
+				return true;
+				// if (selectedPiece == null) { // The player has not selected a piece yet.
+				// 	return true;
+				// } else if (selectedPiece == p) { // The player has selected a piece, but did not move it.
+				// 	return true;					
+				// }
 			}
 		} else {
 			// Empty squares
@@ -117,7 +109,7 @@ public class Board {
 				/* During this turn, the player has selected a Piece which hasn’t moved
 				 * yet and is selecting an empty spot which is a valid move for the
 				 * previously selected Piece. */
-				if (selectedPiece == p && validMove(i, j, x, y)) {
+				if (selectedPiece == p && validMove(i, j, x, y, false)) {
 					return true;
 				}
 
@@ -126,7 +118,9 @@ public class Board {
 				 * multi-captures, you should only select the active piece once; all
 				 * other selections should be valid destination points. */
 				if (!selectedPiece.hasCaptured()) {
-					return validMove(i, j, x, y);
+					return validMove(i, j, x, y, false);
+				} else {
+					return validMove(i, j, x, y, true);
 				}
 			} 
 		}
@@ -135,7 +129,7 @@ public class Board {
 
 	/* Returns true if the piece at (xi, yi) can either move to (xf, yf) or capture to
 	 * (xf, yf), strictly from a geometry/piece-race point of view. */
-	private boolean validMove(int xi, int yi, int xf, int yf) {
+	private boolean validMove(int xi, int yi, int xf, int yf, boolean multiCapture) {
 		if (xi < 0 || xi > N - 1 || yi < 0 || yi > N - 1) {
 			return false;
 		}
@@ -147,18 +141,18 @@ public class Board {
 		int dy = yf - yi;
 
 		// Simple move
-		if (pieceAt(xi, yi).isKing()) {
-			if (dx * dx + dy * dy == 2) {
-				return true;
+		if (!multiCapture) {
+			if (pieceAt(xi, yi).isKing()) {
+				if (dx * dx + dy * dy == 2) {
+					return true;
+				}
 			} else {
-				return false;
-			}
-		} else {
-			if (fireTurn && dx * dx == 1 && dy == 1) {
-				return true;
-			} else if (!fireTurn && dx * dx == 1 && dy == -1) {
-				return true;
-			}
+				if (fireTurn && dx * dx == 1 && dy == 1) {
+					return true;
+				} else if (!fireTurn && dx * dx == 1 && dy == -1) {
+					return true;
+				}
+			}			
 		}
 
 		// Capture
@@ -170,8 +164,6 @@ public class Board {
 					return true;
 				} else if (!fireTurn && pieceAt(xm, ym).isFire()) { // Water captures fire.
 					return true;
-				} else {
-					return false;
 				}
 			}
 		} else {
@@ -179,8 +171,6 @@ public class Board {
 				return true;
 			} else if (!fireTurn && dx * dx == 4 && dy == -2 && pieceAt(xm, ym).isFire()) {
 				return true;
-			} else {
-				return false;
 			}
 		}
 
@@ -222,7 +212,7 @@ public class Board {
 		}
 
 		for (int m = i - 1; m <= i + 1; m++) {
-			for (int n = j - 1; n <= j + 1; j++) {
+			for (int n = j - 1; n <= j + 1; n++) {
 				if (pieceAt(m, n) != null && !pieceAt(m, n).isShield()) {
 					remove(m, n);
 				}
