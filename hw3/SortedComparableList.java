@@ -58,7 +58,7 @@ public class SortedComparableList {
     /** Adds every item in THAT to this list. */
     public void extend(SortedComparableList that) {
         SortedComparableList l = that;
-        while (l.tail != null) {
+        while (l != null) {
             insert(l.head);
             l = l.tail;
         }
@@ -99,8 +99,10 @@ public class SortedComparableList {
             return;
         }
         SortedComparableList l = L;
-        for (int i = 0; i <= len; i++) {
+        int i = 0;
+        while (l != null && i < len) {
             l = l.tail;
+            i++;
         }
         l.tail = null;
     }
@@ -118,7 +120,7 @@ public class SortedComparableList {
      *  output list is [ 0 1 3 4 ].
      **/
     public void squish() {
-        if (tail != null) {
+        if (tail == null) {
             return;
         }
         SortedComparableList prev = this;
@@ -148,7 +150,7 @@ public class SortedComparableList {
      **/
     public void twin() {
         SortedComparableList l = this;
-        while (l.tail != null) {
+        while (l != null) {
             l.tail = new SortedComparableList(l.head, l.tail);
             l = l.tail.tail;
         }
