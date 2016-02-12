@@ -48,10 +48,6 @@ public class TestPlip {
         surrounded.put(Direction.LEFT, new Impassible());
         surrounded.put(Direction.RIGHT, new Impassible());
 
-        //You can create new empties with new Empty();
-        //Despite what the spec says, you cannot test for Cloruses nearby yet.
-        //Sorry!  
-
         Action actual = p.chooseAction(surrounded);
         Action expected = new Action(Action.ActionType.STAY);
 
@@ -82,8 +78,6 @@ public class TestPlip {
         Action expected1 = new Action(Action.ActionType.MOVE, Direction.BOTTOM);
         Action expected2 = new Action(Action.ActionType.STAY);
 
-
-        System.out.println(p.getNeighborsOfType(surrounded, "clorus").size());
         assertTrue(actual.equals(expected1) || actual.equals(expected2));
     }
 
