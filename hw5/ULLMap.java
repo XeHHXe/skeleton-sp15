@@ -1,4 +1,6 @@
 import java.util.Set; /* java.util.Set needed only for challenge problem. */
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /** A data structure that uses a linked list to store pairs of keys and values.
  *  Any key must appear at most once in the dictionary, but values may appear multiple
@@ -8,7 +10,7 @@ import java.util.Set; /* java.util.Set needed only for challenge problem. */
  *  For simplicity, you may assume that nobody ever inserts a null key or value
  *  into your map.
  */ 
-public class ULLMap<K, V> implements Map61B<K, V> {
+public class ULLMap<K, V> implements Map61B<K, V>, Iterable<K> {
     /** Keys and values are stored in a linked list of Entry objects.
       * This variable stores the first pair in this linked list. You may
       * point this at a sentinel node, or use it as a the actual front item
@@ -16,6 +18,31 @@ public class ULLMap<K, V> implements Map61B<K, V> {
       */
     private Entry front;
     private int size;
+
+    public Iterator<K> iterator() {
+        return new ULLMapIter();
+    }
+
+    public class ULLMapIter implements Iterator<K> {
+        private Entry p = front;
+
+        public boolean hasNext() {
+            return p != null;
+        }
+
+        public K next() {
+            if (hasNext()) {
+                K thisKey = p.key;
+                p = p.next;
+                return thisKey;
+            }
+            throw new NoSuchElementException();
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
 
     @Override
     public V get(K key) {
@@ -118,19 +145,25 @@ public class ULLMap<K, V> implements Map61B<K, V> {
     /* Methods below are all challenge problems. Will not be graded in any way. 
      * Autograder will not test these. */
     @Override
-    public V remove(K key) { //FIX ME SO I COMPILE
+    public V remove(K key) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public V remove(K key, V value) { //FIX ME SO I COMPILE
+    public V remove(K key, V value) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Set<K> keySet() { //FIX ME SO I COMPILE
+    public Set<K> keySet() {
         throw new UnsupportedOperationException();
     }
 
-
+    public static <V, K> ULLMap<V, K> invert(ULLMap<K, V> map) {
+        ULLMap<V, K> invertedMap = new ULLMap<V, K>();
+        for (K k : map) {
+            invertedMap.put(map.get(k), k);
+        }
+        return invertedMap;
+    }
 }
