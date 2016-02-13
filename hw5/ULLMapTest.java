@@ -10,8 +10,13 @@ public class ULLMapTest {
     @Test
     public void testBasic() {
         ULLMap<String, String> um = new ULLMap<String, String>();
-        um.put("Gracias", "Dios Basado");
-        assertEquals(um.get("Gracias"), "Dios Basado");
+        um.put("San Francisco", "California");
+        um.put("Seattle", "Washington");
+        um.put("Portland", "Oregon");
+        um.put("Los Angeles", "California");
+        assertEquals(um.get("San Francisco"), "California");
+        assertEquals(um.containsKey("Seattle"), true);
+        assertEquals(um.size(), 4);
     }
 
     

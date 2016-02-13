@@ -8,39 +8,69 @@ import java.util.Set; /* java.util.Set needed only for challenge problem. */
  *  For simplicity, you may assume that nobody ever inserts a null key or value
  *  into your map.
  */ 
-public class ULLMap { //FIX ME
+public class ULLMap<K, V> implements Map61B<K, V> {
     /** Keys and values are stored in a linked list of Entry objects.
       * This variable stores the first pair in this linked list. You may
       * point this at a sentinel node, or use it as a the actual front item
       * of the linked list. 
       */
     private Entry front;
+    private int size;
 
     @Override
-    public get(key) { //FIX ME
-    //FILL ME IN
-        return null; //FIX ME
+    public V get(K key) {
+        if (key == null) {
+            return null;
+        }
+
+        // Check if key already exists in the list.
+        Entry p = front;
+        while (p != null) {
+            if (p.key.equals(key)) {
+                return p.val;
+            }
+            p = p.next;
+        }
+
+        // Key not found in the list.
+        return null;        
     }
 
     @Override
-    public void put(key, val) { //FIX ME
-    //FILL ME IN
+    public void put(K key, V val) { 
+        if (key == null || val == null) {
+            return;
+        }
+        
+        // Check if key already exists in the list.
+        Entry p = front;
+        while (p != null) {
+            if (p.key.equals(key)) {
+                p.val = val;
+                return;
+            }
+            p = p.next;
+        }
+
+        // Key not found in the list.
+        front = new Entry(key, val, front);
+        size++;
     }
 
     @Override
-    public boolean containsKey(key) { //FIX ME
-    //FILL ME IN
-        return false; //FIX ME
+    public boolean containsKey(K key) {
+        return front.get(key) != null;
     }
 
     @Override
     public int size() {
-        return 0; // FIX ME (you can add extra instance variables if you want)
+        return size;
     }
 
     @Override
     public void clear() {
-    //FILL ME IN
+        front = null;
+        size = 0;
     }
 
 
@@ -50,7 +80,7 @@ public class ULLMap { //FIX ME
     
         /** Stores KEY as the key in this key-value pair, VAL as the value, and
          *  NEXT as the next node in the linked list. */
-        public Entry(k, v, Entry n) { //FIX ME
+        public Entry(K k, V v, Entry n) {
             key = k;
             val = v;
             next = n;
@@ -58,15 +88,28 @@ public class ULLMap { //FIX ME
 
         /** Returns the Entry in this linked list of key-value pairs whose key
          *  is equal to KEY, or null if no such Entry exists. */
-        public Entry get(k) { //FIX ME
-            //FILL ME IN (using equals, not ==)
-            return null; //FIX ME
+        public Entry get(K k) { 
+            if (key == null) {
+                return null;
+            }
+
+            // Check if key already exists in the list.
+            Entry p = front;
+            while (p != null) {
+                if (p.key.equals(k)) {
+                    return p;
+                }
+                p = p.next;
+            }
+
+            // Key not found in the list.
+            return null;
         }
 
         /** Stores the key of the key-value pair of this node in the list. */
-        private key; //FIX ME
+        private K key;
         /** Stores the value of the key-value pair of this node in the list. */
-        private val; //FIX ME
+        private V val;
         /** Stores the next Entry in the linked list. */
         private Entry next;
     
@@ -75,17 +118,17 @@ public class ULLMap { //FIX ME
     /* Methods below are all challenge problems. Will not be graded in any way. 
      * Autograder will not test these. */
     @Override
-    public remove(key) { //FIX ME SO I COMPILE
+    public V remove(K key) { //FIX ME SO I COMPILE
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public remove(key, value) { //FIX ME SO I COMPILE
+    public V remove(K key, V value) { //FIX ME SO I COMPILE
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Set<> keySet() { //FIX ME SO I COMPILE
+    public Set<K> keySet() { //FIX ME SO I COMPILE
         throw new UnsupportedOperationException();
     }
 
