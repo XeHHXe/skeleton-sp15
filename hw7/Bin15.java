@@ -36,12 +36,18 @@ public class Bin15 {
     
     @Override
     public boolean equals(Object o) {
-        return false; // YOUR CODE HERE
+        if (o != null && o instanceof Bin15) {
+            Bin15 other = (Bin15) o;
+            if (this.myBinStr == other.myBinStr) {
+                return true;
+            }
+        }
+        return false;
     }
     
     @Override
     public int hashCode() {
-        return -1; // YOUR CODE HERE
+        return Integer.parseInt(myBinStr, 2); // YOUR CODE HERE
     }
 
     /* DO THIS LAST, AFTER IMPLEMENTING EVERYTHING
@@ -51,7 +57,7 @@ public class Bin15 {
     in the method followUpAnswer(). 
     */
     public static final int followUpAnswer() {
-        return 42; // YOUR CODE HERE. THIS MAY OR MAY NOT BE CORRECT.
+        return 32; // int - 4 bytes, 32 bits
     }
     
     public static void main(String[] args) {
@@ -60,7 +66,9 @@ public class Bin15 {
         // 0x9 means 9 in hexadecimal
         // 1 means 1 in decimal
         // 0b01 means 01 or 1 in binary
-        System.out.println("Note to self: Answer follow-up question!");
+        Bin15 cb = new Bin15("000000000000111");
+        System.out.print("Does hashCode() of 000000000000111 (bin) equals 7 (dec)? ");
+        System.out.println(c == cb.hashCode());
     }
 }
 
