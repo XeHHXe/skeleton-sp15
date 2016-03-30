@@ -27,7 +27,7 @@ public class Username {
         charListGen();
 
         if (reqName == null) {
-            throw new IllegalArgumentException("Requested username is null!");
+            throw new NullPointerException("Requested username is null!");
         }
         if (reqName.length() != 2 && reqName.length() != 3) {
             throw new IllegalArgumentException("Incorrect username length!");
