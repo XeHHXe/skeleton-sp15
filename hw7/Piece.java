@@ -61,12 +61,28 @@ public class Piece {
 
     @Override
     public boolean equals(Object o) {
-        return false; // YOUR CODE HERE
+        if (o instanceof Piece) {
+            Piece p = (Piece) o;
+            if (this.side == p.side && this.type == p.type 
+                && this.isKing == p.isKing && this.hasCaptured == p.hasCaptured 
+                && this.x == p.x && this.y == p.y) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return 5; // YOUR CODE HERE
+        int type;
+        switch (this.type) {
+            case "regular": type = 0; break;
+            case "bomb": type = 1; break;
+            case "shield": type = 2; break;
+            default: type = 0;
+        }
+        return ((side ? 1 : 0) << 10) + (type << 9) + ((isKing ? 1 : 0) << 7) 
+                + ((hasCaptured ? 1 : 0) << 6) + (x << 3) + y;
     }
 
     public static void main(String[] args) {
