@@ -28,7 +28,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 			this.capacity = trimToPowerOf2(initialSize);
 		}
 		this.loadFactor = loadFactor;
-		threshold = (int)(capacity * loadFactor);
+		threshold = (int) (capacity * loadFactor);
 		table = new LinkedList[capacity];
 	}
 
@@ -100,19 +100,24 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 				throw new RuntimeException("Exceeding maximum capacity!");
 			}
 			capacity = capacity << 1;
-			threshold = (int)(capacity * loadFactor);
-			// Rehash the map.
-			Set<Entry<K, V>> eSet = entrySet();
-			for (Entry<K, V> e : eSet) {
-				put(e.getKey(), e.getValue());
-			}
+			table = new LinkedList[capacity];
+			threshold = (int) (capacity * loadFactor);
+			size = 0;
+			rehash();
 		}
 		int bucket = hash(key.hashCode());
 		if (table[bucket] == null) {
-			table[bucket] = new LinkedList();
+			table[bucket] = new LinkedList<Entry<K, V>>();
 		}
 		table[bucket].add(new Entry(key, value));
 		size++;
+	}
+
+	private void rehash() {
+		Set<Entry<K, V>> eSet = entrySet();
+		for (Entry<K, V> e : eSet) {
+			put(e.getKey(), e.getValue());
+		}
 	}
 
 	/* Returns a Set view of the entries contained in this map. */
@@ -185,10 +190,14 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 	 * constant multiples at each bit position have a bounded
 	 * number of collisions (approximately 8 at default load factor). 
 	 * (Obviously stolen from Java library) */
-	private int hash(int h) {
+	private int hash(int hashCode) {
+		return supplementalHash(hashCode) & (capacity - 1);
+	}
+  
+	/** Ensure the hashing is evenly distributed */
+	private static int supplementalHash(int h) {
 		h ^= (h >>> 20) ^ (h >>> 12);
-		h ^= (h >>> 7) ^ (h >>> 4);
-		return h & (capacity - 1);
+		return h ^ (h >>> 7) ^ (h >>> 4);
 	}
 
 	private class Entry<K, V> {
