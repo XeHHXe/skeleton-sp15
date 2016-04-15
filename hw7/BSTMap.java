@@ -114,19 +114,19 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 	 * Not required for HW6. */
 	@Override
 	public V remove(K key) {
-		throw new UnsupportedOperationException();
+		return null;
 	}
 
 	/* Removes the entry for the specified key only if it is currently mapped to
 	 * the specified value. Not required for HW6. */
 	@Override
 	public V remove(K key, V value) {
-		throw new UnsupportedOperationException();
+		return null;
 	}
 
 	/* Returns a Set view of the keys contained in this map. Not required for HW6. */
 	@Override
 	public Set<K> keySet() {
-		throw new UnsupportedOperationException();
+		return null;
 	}
 }
