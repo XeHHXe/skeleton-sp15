@@ -1,6 +1,7 @@
 /* Radix.java */
 
 package radix;
+import java.util.Arrays;
 
 /**
  * Sorts is a class that contains an implementation of radix sort.
@@ -37,11 +38,11 @@ public class Sorts {
             j = (keys[i] / radix) % BASE;
             count[j]++; // count elements in each bucket
         }
-        for (i = 0; i < BASE; i++) {
+        for (i = 1; i < BASE; i++) {
             count[i] = count[i - 1] + count[i]; 
             // allocate positions in result for each bucket
         }
-        for (i = BASE - 1; i >= 0; i--) {
+        for (i = keys.length - 1; i >= 0; i--) {
             j = (keys[i] / radix) % BASE;
             result[count[j] - 1] = keys[i];
             count[j]--;
@@ -68,6 +69,11 @@ public class Sorts {
             // sort from least to most significant digit
         }
         return result;
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {123, 222, 11, 79, 8322, 1, 213719, 37, 99999};
+        System.out.println(Arrays.toString(radixSort(arr)));
     }
 
 }
