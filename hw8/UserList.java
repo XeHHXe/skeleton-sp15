@@ -70,7 +70,31 @@ public class UserList {
     **/ 
     public static void partition(String sortFeature, CatenableQueue<User> qUnsorted, int pivot, 
         CatenableQueue<User> qLess, CatenableQueue<User> qEqual, CatenableQueue<User> qGreater){
-        //Replace with solution.
+        if (sortFeature.equals("id")) {
+            while (qUnsorted.front() != null) {
+                User cur = qUnsorted.dequeue();
+                if (cur.getId() < pivot) {
+                    qLess.enqueue(cur);
+                } else if (cur.getId() > pivot) {
+                    qGreater.enqueue(cur);
+                } else {
+                    qEqual.enqueue(cur);
+                }                
+            }
+        } else if (sortFeature.equals("pages")) {
+            while (qUnsorted.front() != null) {
+                User cur = qUnsorted.dequeue();
+                if (cur.getPagesPrinted() < pivot) {
+                    qLess.enqueue(cur);
+                } else if (cur.getPagesPrinted() > pivot) {
+                    qGreater.enqueue(cur);
+                } else {
+                    qEqual.enqueue(cur);
+                }                
+            }
+        } else {
+            System.out.println("Error: Unknown sortFeature!");
+        }
     }
 
     /**
@@ -81,7 +105,34 @@ public class UserList {
     *   @param q is an unsorted CatenableQueue containing User items.
     **/
     public static void quickSort(String sortFeature, CatenableQueue<User> q){ 
-        //Replace with solution.
+        CatenableQueue<User> less = new CatenableQueue<User>();
+        CatenableQueue<User> equal = new CatenableQueue<User>();
+        CatenableQueue<User> greater = new CatenableQueue<User>();
+        CatenableQueue<User> sorted = new CatenableQueue<User>();
+        int pivot;
+
+        if (sortFeature.equals("id")) {
+            pivot = q.front().getId();
+        } else if (sortFeature.equals("pages")) {
+            pivot = q.front().getPagesPrinted();
+        } else {
+            System.out.println("Error: Unknown sortFeature!");
+            return;
+        }
+
+        if (q.front() == null) {
+            return;
+        }
+        partition(sortFeature, q, pivot, less, equal, greater);
+        quickSort(sortFeature, less);
+        quickSort(sortFeature, greater);
+        sorted.append(less);
+        sorted.append(equal);
+        sorted.append(greater);
+
+        while (sorted.front() != null) {
+            q.enqueue(sorted.dequeue());
+        }
     }
 
     /**
