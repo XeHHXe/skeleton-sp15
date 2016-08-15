@@ -185,7 +185,7 @@ public class UserList {
                 return null;
             }
 
-            if (f1 < f2) {
+            if (f1 <= f2) { // equal sign required to ensure stability of mergesort.
                 mergedQueue.enqueue(q1.dequeue());
             } else {
                 mergedQueue.enqueue(q2.dequeue());
@@ -232,7 +232,9 @@ public class UserList {
     *   If two Users have printed the same number of pages, the User with the smaller user ID is first.
     **/
     public void sortByBothFeatures(){
-        //Replace with solution. Don't overthink this one!
+        // mergesort is stable, while quicksort isn't.
+        mergeSort("id");
+        mergeSort("pages");
     }
 
 
